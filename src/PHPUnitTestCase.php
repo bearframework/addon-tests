@@ -136,7 +136,18 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * A default test case so that PHPUnit will not trigger warning about no tests in the TestCase
+     * A setup method that initializes the app if not initialized. You can override it and initialize the app yourself.
+     */
+    public function setUp()
+    {
+        if (self::$app === null) {
+            $this->initializeApp();
+        }
+        parent::setUp();
+    }
+
+    /**
+     * A default test case so that PHPUnit will not trigger warning about no tests in the TestCase.
      */
     public function testDefault()
     {
