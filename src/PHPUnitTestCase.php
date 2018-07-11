@@ -54,8 +54,8 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
         self::$app->request->method = 'GET';
 
         $list = \BearFramework\Addons::getList();
-        if (isset($list[0])) {
-            self::$app->addons->add($list[0]->id, isset($config['addonOptions']) ? $config['addonOptions'] : []);
+        if ($list->length > 0) {
+            self::$app->addons->add($list[$list->length - 1]->id, isset($config['addonOptions']) ? $config['addonOptions'] : []);
         }
     }
 
