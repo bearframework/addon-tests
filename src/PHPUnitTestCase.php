@@ -148,6 +148,7 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * A default test case so that PHPUnit will not trigger warning about no tests in the TestCase.
+     * @runInSeparateProcess
      */
     public function testDefault()
     {
