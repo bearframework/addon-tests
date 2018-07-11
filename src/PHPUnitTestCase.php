@@ -138,7 +138,7 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     /**
      * A setup method that initializes the app if not initialized. You can override it and initialize the app yourself.
      */
-    public function setUp()
+    protected function setUp()
     {
         if (self::$app === null) {
             $this->initializeApp();
