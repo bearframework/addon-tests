@@ -15,7 +15,7 @@ namespace BearFramework\AddonTests;
 class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
 {
 
-    private $app = null;
+    private static $app = null;
 
     /**
      * 
@@ -25,20 +25,20 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
      */
     protected function initializeApp(array $config = []): void
     {
-        if ($this->app !== null) {
+        if (self::$app !== null) {
             throw new \Exception('The app is already initialized!');
         }
-        $rootDir = $this->getTempDir() . '/';
-        $this->app = new \BearFramework\App();
-        $this->makeDir($rootDir . 'app/');
-        $this->makeDir($rootDir . 'data/');
-        $this->makeDir($rootDir . 'logs/');
-        $this->app->config->handleErrors = false;
+        $dir = $this->getTempDir() . '/';
+        self::$app = new \BearFramework\App();
+        $this->makeDir($dir . 'app/');
+        $this->makeDir($dir . 'data/');
+        $this->makeDir($dir . 'logs/');
+        self::$app->config->handleErrors = false;
 
         $initialConfig = [
-            'appDir' => $rootDir . 'app/',
-            'dataDir' => $rootDir . 'data/',
-            'logsDir' => $rootDir . 'logs/',
+            'appDir' => $dir . 'app/',
+            'dataDir' => $dir . 'data/',
+            'logsDir' => $dir . 'logs/',
             'handleErrors' => false
         ];
         $config = array_merge($initialConfig, $config);
@@ -46,16 +46,16 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
             if ($key === 'addonOptions') {
                 continue;
             }
-            $this->app->config->$key = $value;
+            self::$app->config->$key = $value;
         }
 
-        $this->app->initialize();
-        $this->app->request->base = 'http://example.com/';
-        $this->app->request->method = 'GET';
+        self::$app->initialize();
+        self::$app->request->base = 'http://example.com/';
+        self::$app->request->method = 'GET';
 
         $list = \BearFramework\Addons::getList();
         if (isset($list[0])) {
-            $this->app->addons->add($list[0]->id, isset($config['addonOptions']) ? $config['addonOptions'] : []);
+            self::$app->addons->add($list[0]->id, isset($config['addonOptions']) ? $config['addonOptions'] : []);
         }
     }
 
@@ -65,10 +65,10 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
      */
     protected function getApp(): \BearFramework\App
     {
-        if ($this->app === null) {
+        if (self::$app === null) {
             $this->initializeApp();
         }
-        return $this->app;
+        return self::$app;
     }
 
     /**

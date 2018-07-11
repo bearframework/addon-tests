@@ -10,13 +10,13 @@
 use BearFramework\AddonTests\PHPUnitTestCase;
 
 /**
- * @runTestsInSeparateProcesses
+ * 
  */
 class BasicsTest extends PHPUnitTestCase
 {
 
     /**
-     * 
+     * @runInSeparateProcess
      */
     public function testApp()
     {
@@ -25,7 +25,7 @@ class BasicsTest extends PHPUnitTestCase
     }
 
     /**
-     * 
+     * @runInSeparateProcess
      */
     public function testMakeFilesAndDirs()
     {
@@ -37,13 +37,33 @@ class BasicsTest extends PHPUnitTestCase
     }
 
     /**
-     * 
+     * @runInSeparateProcess
      */
     public function testIntitializeAppTwiceException()
     {
         $this->initializeApp();
         $this->expectException('\Exception');
         $this->initializeApp();
+    }
+
+    /**
+     * 
+     */
+    public function testAppInstance1()
+    {
+        $app = $this->getApp();
+        $this->assertTrue($app instanceof \BearFramework\App);
+        $app->config->key1 = 'value1';
+    }
+
+    /**
+     * 
+     */
+    public function testAppInstance2()
+    {
+        $app = $this->getApp();
+        $this->assertTrue($app instanceof \BearFramework\App);
+        $this->assertEquals($app->config->key1, 'value1');
     }
 
 }
