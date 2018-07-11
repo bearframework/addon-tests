@@ -36,4 +36,14 @@ class BasicsTest extends PHPUnitTestCase
         $this->assertTrue(is_dir($tempDir . '/dir1'));
     }
 
+    /**
+     * 
+     */
+    public function testIntitializeAppTwiceException()
+    {
+        $this->initializeApp();
+        $this->expectException('\Exception');
+        $this->initializeApp();
+    }
+
 }

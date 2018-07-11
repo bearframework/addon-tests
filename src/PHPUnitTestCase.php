@@ -15,19 +15,25 @@ namespace BearFramework\AddonTests;
 class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
 {
 
+    private $app = null;
+
     /**
      * 
      * @param array $config
-     * @return \BearFramework\App
+     * @return void
+     * @throws \Exception
      */
-    protected function getApp(array $config = []): \BearFramework\App
+    protected function initializeApp(array $config = []): void
     {
+        if ($this->app !== null) {
+            throw new \Exception('The app is already initialized!');
+        }
         $rootDir = $this->getTempDir() . '/';
-        $app = new \BearFramework\App();
+        $this->app = new \BearFramework\App();
         $this->makeDir($rootDir . 'app/');
         $this->makeDir($rootDir . 'data/');
         $this->makeDir($rootDir . 'logs/');
-        $app->config->handleErrors = false;
+        $this->app->config->handleErrors = false;
 
         $initialConfig = [
             'appDir' => $rootDir . 'app/',
@@ -40,18 +46,29 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
             if ($key === 'addonOptions') {
                 continue;
             }
-            $app->config->$key = $value;
+            $this->app->config->$key = $value;
         }
 
-        $app->initialize();
-        $app->request->base = 'http://example.com/';
-        $app->request->method = 'GET';
+        $this->app->initialize();
+        $this->app->request->base = 'http://example.com/';
+        $this->app->request->method = 'GET';
 
         $list = \BearFramework\Addons::getList();
         if (isset($list[0])) {
-            $app->addons->add($list[0]->id, isset($config['addonOptions']) ? $config['addonOptions'] : []);
+            $this->app->addons->add($list[0]->id, isset($config['addonOptions']) ? $config['addonOptions'] : []);
         }
-        return $app;
+    }
+
+    /**
+     * 
+     * @return \BearFramework\App
+     */
+    protected function getApp(): \BearFramework\App
+    {
+        if ($this->app === null) {
+            $this->initializeApp();
+        }
+        return $this->app;
     }
 
     /**
