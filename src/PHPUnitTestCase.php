@@ -118,4 +118,12 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
+    /**
+     * A default test case so that PHPUnit will not trigger warning about no tests in the TestCase
+     */
+    public function testDefault()
+    {
+        $this->assertTrue(true);
+    }
+
 }
