@@ -1,0 +1,24 @@
+{
+    "name": "bearframework/addon-tests",
+    "description": "Bear Framework addon test utilities",
+    "keywords": ["Bear Framework", "addon", "tests"],
+    "homepage": "https://github.com/bearframework/addon-tests",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ivo Petkov",
+            "email": "ivo@ivopetkov.com",
+            "homepage": "http://ivopetkov.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "bearframework/bearframework": "0.10.*",
+        "phpunit/phpunit": "6.*|7.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "BearFramework\\AddonTests\\": "src/"
+        }
+    }
+}
