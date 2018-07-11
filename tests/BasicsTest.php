@@ -12,7 +12,7 @@ use BearFramework\AddonTests\PHPUnitTestCase;
 /**
  * @runTestsInSeparateProcesses
  */
-class DefaultTest extends PHPUnitTestCase
+class BasicsTest extends PHPUnitTestCase
 {
 
     /**
