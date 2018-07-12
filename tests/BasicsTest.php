@@ -41,7 +41,6 @@ class BasicsTest extends PHPUnitTestCase
      */
     public function testIntitializeAppTwiceException()
     {
-        $this->initializeApp();
         $this->expectException('\Exception');
         $this->initializeApp();
     }

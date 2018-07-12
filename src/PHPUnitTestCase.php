@@ -29,12 +29,11 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
             throw new \Exception('The app is already initialized!');
         }
         $dir = $this->getTempDir() . '/';
-        self::$app = new \BearFramework\App();
         $this->makeDir($dir . 'app/');
         $this->makeDir($dir . 'data/');
         $this->makeDir($dir . 'logs/');
-        self::$app->config->handleErrors = false;
 
+        self::$app = new \BearFramework\App();
         $initialConfig = [
             'appDir' => $dir . 'app/',
             'dataDir' => $dir . 'data/',
@@ -53,9 +52,9 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
         self::$app->request->base = 'http://example.com/';
         self::$app->request->method = 'GET';
 
-        $list = \BearFramework\Addons::getList();
-        if ($list->length > 0) {
-            self::$app->addons->add($list[$list->length - 1]->id, isset($config['addonOptions']) ? $config['addonOptions'] : []);
+        $addonID = $this->getTestedAddonID();
+        if ($addonID !== null) {
+            self::$app->addons->add($addonID, isset($config['addonOptions']) ? $config['addonOptions'] : []);
         }
     }
 
@@ -133,6 +132,30 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
         } else {
             throw new \Exception('Unsupported file type (' . $type . ')!');
         }
+    }
+
+    /**
+     * Try to find the tested addon ID
+     * @return string|null
+     */
+    private function getTestedAddonID(): ?string
+    {
+        $currentDir = str_replace('\\', '/', __DIR__);
+        $expectedPath = '/vendor/bearframework/addon-tests/src';
+        $expectedPathLength = strlen($expectedPath);
+        if (substr($currentDir, -$expectedPathLength) === $expectedPath) {
+            $addonDir = substr($currentDir, 0, -$expectedPathLength);
+            if (is_file($addonDir . '/autoload.php')) { // Try parse the auloload.php file and find the addon ID
+                $autoloadFileContent = file_get_contents($addonDir . '/autoload.php');
+                $matches = null;
+                if (preg_match('/BearFramework\\\\Addons::register\([\'"]{1}(.*?)[\'"]{1}/', $autoloadFileContent, $matches)) {
+                    if (isset($matches[1])) {
+                        return $matches[1];
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
