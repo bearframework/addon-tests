@@ -37,24 +37,35 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
         $initialConfig = [
             'appDir' => $dir . 'app/',
             'dataDir' => $dir . 'data/',
-            'logsDir' => $dir . 'logs/',
-            'handleErrors' => false
+            'logsDir' => $dir . 'logs/'
         ];
         $config = array_merge($initialConfig, $config);
-        foreach ($config as $key => $value) {
-            if ($key === 'addonOptions') {
-                continue;
-            }
-            self::$app->config->$key = $value;
-        }
+        $config['appDir'] = rtrim($config['appDir'], '/\\');
+        $config['dataDir'] = rtrim($config['dataDir'], '/\\');
+        $config['logsDir'] = rtrim($config['logsDir'], '/\\');
 
-        self::$app->initialize();
         self::$app->request->base = 'http://example.com/';
         self::$app->request->method = 'GET';
 
+        if (strlen($config['dataDir']) > 0) {
+            self::$app->data->useFileDriver($config['dataDir']);
+        } else {
+            self::$app->data->useNullDriver();
+        }
+
+        if (strlen($config['logsDir']) > 0) {
+            self::$app->logs->useFileLogger($config['logsDir']);
+        } else {
+            self::$app->logs->useNullLogger();
+        }
+
+        if (is_file($config['appDir'] . '/index.php')) {
+            self::$app->contexts->add($config['appDir']);
+        }
+
         $addonID = $this->getTestedAddonID();
         if ($addonID !== null) {
-            self::$app->addons->add($addonID, isset($config['addonOptions']) ? $config['addonOptions'] : []);
+            self::$app->addons->add($addonID);
         }
     }
 

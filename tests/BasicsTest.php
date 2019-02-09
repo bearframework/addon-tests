@@ -52,7 +52,7 @@ class BasicsTest extends PHPUnitTestCase
     {
         $app = $this->getApp();
         $this->assertTrue($app instanceof \BearFramework\App);
-        $app->config->key1 = 'value1';
+        $app->key1 = 'value1';
     }
 
     /**
@@ -62,7 +62,7 @@ class BasicsTest extends PHPUnitTestCase
     {
         $app = $this->getApp();
         $this->assertTrue($app instanceof \BearFramework\App);
-        $this->assertEquals($app->config->key1, 'value1');
+        $this->assertEquals($app->key1, 'value1');
     }
 
 }
