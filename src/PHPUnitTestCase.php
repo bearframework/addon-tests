@@ -53,6 +53,8 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
             self::$app->data->useNullDriver();
         }
 
+        self::$app->cache->useAppDataDriver();
+
         if (strlen($config['logsDir']) > 0) {
             self::$app->logs->useFileLogger($config['logsDir']);
         } else {
