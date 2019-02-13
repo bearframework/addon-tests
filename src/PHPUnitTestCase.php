@@ -16,59 +16,51 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
 {
 
     private static $app = null;
+    private static $tempDirs = [];
 
     /**
      * 
-     * @param array $config
      * @return void
      * @throws \Exception
      */
-    protected function initializeApp(array $config = []): void
+    protected function initializeApp(): void
     {
         if (self::$app !== null) {
             throw new \Exception('The app is already initialized!');
         }
-        $dir = $this->getTempDir() . '/';
-        $this->makeDir($dir . 'app/');
-        $this->makeDir($dir . 'data/');
-        $this->makeDir($dir . 'logs/');
+        $dir = $this->getTempDir();
+        $this->makeDir($dir . '/data');
+        $this->makeDir($dir . '/logs');
 
         self::$app = new \BearFramework\App();
-        $initialConfig = [
-            'appDir' => $dir . 'app/',
-            'dataDir' => $dir . 'data/',
-            'logsDir' => $dir . 'logs/'
-        ];
-        $config = array_merge($initialConfig, $config);
-        $config['appDir'] = rtrim($config['appDir'], '/\\');
-        $config['dataDir'] = rtrim($config['dataDir'], '/\\');
-        $config['logsDir'] = rtrim($config['logsDir'], '/\\');
-
         self::$app->request->base = 'http://example.com/';
         self::$app->request->method = 'GET';
 
-        if (strlen($config['dataDir']) > 0) {
-            self::$app->data->useFileDriver($config['dataDir']);
-        } else {
-            self::$app->data->useNullDriver();
-        }
-
+        self::$app->logs->useFileLogger($dir . '/logs');
+        self::$app->data->useFileDriver($dir . '/data');
         self::$app->cache->useAppDataDriver();
-
-        if (strlen($config['logsDir']) > 0) {
-            self::$app->logs->useFileLogger($config['logsDir']);
-        } else {
-            self::$app->logs->useNullLogger();
-        }
-
-        if (is_file($config['appDir'] . '/index.php')) {
-            self::$app->contexts->add($config['appDir']);
-        }
 
         $addonID = $this->getTestedAddonID();
         if ($addonID !== null) {
             self::$app->addons->add($addonID);
         }
+    }
+
+    /**
+     * 
+     * @param string $indexContent
+     * @return void
+     * @throws \Exception
+     */
+    protected function makeContext(string $indexContent = '<?php'): void
+    {
+        if (self::$app === null) {
+            throw new \Exception('The app is not initialized!');
+        }
+        $dir = $this->getTempDir();
+        $this->makeDir($dir);
+        $this->makeFile($dir . '/index.php', $indexContent);
+        self::$app->contexts->add($dir);
     }
 
     /**
@@ -89,8 +81,9 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
      */
     protected function getTempDir(): string
     {
-        $dir = sys_get_temp_dir() . '/bearframework-addon-unittests/' . uniqid();
+        $dir = sys_get_temp_dir() . '/bearframework-addon-unittests/' . md5(uniqid());
         $this->makeDir($dir);
+        self::$tempDirs[] = $dir;
         return $dir;
     }
 
@@ -119,6 +112,32 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
             $this->makeDir($pathinfo['dirname']);
         }
         file_put_contents($filename, $content);
+    }
+
+    /**
+     * 
+     * @param string $dir
+     * @return void
+     */
+    protected function deleteDir(string $dir): void
+    {
+        $dir = rtrim($dir, '/\\');
+        if (is_dir($dir)) {
+            $handle = opendir($dir);
+            if ($handle) {
+                while ($file = readdir($handle)) {
+                    if ($file != '.' && $file != '..') {
+                        if (!is_dir($dir . '/' . $file)) {
+                            unlink($dir . '/' . $file);
+                        } else {
+                            $this->deleteDir($dir . '/' . $file);
+                        }
+                    }
+                }
+                closedir($handle);
+                rmdir($dir);
+            }
+        }
     }
 
     /**
@@ -172,6 +191,15 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * A default test case so that PHPUnit will not trigger warning about no tests in the TestCase.
+     * @runInSeparateProcess
+     */
+    public function testDefault()
+    {
+        $this->assertTrue(true);
+    }
+
+    /**
      * A setup method that initializes the app if not initialized. You can override it and initialize the app yourself.
      */
     protected function setUp()
@@ -183,12 +211,14 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * A default test case so that PHPUnit will not trigger warning about no tests in the TestCase.
-     * @runInSeparateProcess
+     * Removes the temp dir created.
      */
-    public function testDefault()
+    protected function tearDown()
     {
-        $this->assertTrue(true);
+        foreach (self::$tempDirs as $dir) {
+            $this->deleteDir($dir);
+        }
+        parent::tearDown();
     }
 
 }
