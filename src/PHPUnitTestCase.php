@@ -19,31 +19,44 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     private static $tempDirs = [];
 
     /**
+     * Overwrite this method to initialize the app yourself.
      * 
-     * @return void
-     * @throws \Exception
+     * @param bool $setLogger
+     * @param bool $setDataDriver
+     * @param bool $setCacheDriver
+     * @param bool $addAddon
+     * @return \BearFramework\App
      */
-    protected function initializeApp(): void
+    protected function initializeApp(bool $setLogger = true, bool $setDataDriver = true, bool $setCacheDriver = true, bool $addAddon = true): \BearFramework\App
     {
-        if (self::$app !== null) {
-            throw new \Exception('The app is already initialized!');
+        $app = new \BearFramework\App();
+        $app->request->base = 'http://example.com/';
+        $app->request->method = 'GET';
+
+        if ($setLogger) {
+            $logsDir = $this->getTempDir();
+            $this->makeDir($logsDir);
+            $app->logs->useFileLogger($logsDir);
         }
-        $dir = $this->getTempDir();
-        $this->makeDir($dir . '/data');
-        $this->makeDir($dir . '/logs');
 
-        self::$app = new \BearFramework\App();
-        self::$app->request->base = 'http://example.com/';
-        self::$app->request->method = 'GET';
-
-        self::$app->logs->useFileLogger($dir . '/logs');
-        self::$app->data->useFileDriver($dir . '/data');
-        self::$app->cache->useAppDataDriver();
-
-        $addonID = $this->getTestedAddonID();
-        if ($addonID !== null) {
-            self::$app->addons->add($addonID);
+        if ($setDataDriver) {
+            $dataDir = $this->getTempDir();
+            $this->makeDir($dataDir);
+            $app->data->useFileDriver($dataDir);
         }
+
+        if ($setCacheDriver) {
+            $app->cache->useAppDataDriver();
+        }
+
+        if ($addAddon) {
+            $addonID = $this->getTestedAddonID();
+            if ($addonID !== null) {
+                $app->addons->add($addonID);
+            }
+        }
+
+        return $app;
     }
 
     /**
@@ -54,13 +67,11 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
      */
     protected function makeContext(string $indexContent = '<?php'): void
     {
-        if (self::$app === null) {
-            throw new \Exception('The app is not initialized!');
-        }
+        $app = $this->getApp();
         $dir = $this->getTempDir();
         $this->makeDir($dir);
         $this->makeFile($dir . '/index.php', $indexContent);
-        self::$app->contexts->add($dir);
+        $app->contexts->add($dir);
     }
 
     /**
@@ -70,7 +81,7 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     protected function getApp(): \BearFramework\App
     {
         if (self::$app === null) {
-            $this->initializeApp();
+            self::$app = $this->initializeApp();
         }
         return self::$app;
     }
@@ -200,13 +211,11 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * A setup method that initializes the app if not initialized. You can override it and initialize the app yourself.
+     * A setup method that initializes the app if not initialized.
      */
     protected function setUp()
     {
-        if (self::$app === null) {
-            $this->initializeApp();
-        }
+        $this->getApp(); // Initialize the app
         parent::setUp();
     }
 
