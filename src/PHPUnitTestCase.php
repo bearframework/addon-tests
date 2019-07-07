@@ -10,7 +10,7 @@
 namespace BearFramework\AddonTests;
 
 /**
- * 
+ *
  */
 class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
 {
@@ -20,7 +20,7 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * Overwrite this method to initialize the app yourself.
-     * 
+     *
      * @param bool $setLogger
      * @param bool $setDataDriver
      * @param bool $setCacheDriver
@@ -60,7 +60,7 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * 
+     *
      * @param string $indexContent
      * @return void
      * @throws \Exception
@@ -75,10 +75,10 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * 
+     *
      * @return \BearFramework\App
      */
-    protected function getApp(): \BearFramework\App
+    public function getApp(): \BearFramework\App
     {
         if (self::$app === null) {
             self::$app = $this->initializeApp();
@@ -87,7 +87,7 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * 
+     *
      * @return string
      */
     protected function getTempDir(): string
@@ -99,7 +99,7 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * 
+     *
      * @param string $dir
      * @return void
      */
@@ -111,7 +111,7 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * 
+     *
      * @param string $filename
      * @param string $content
      * @return void
@@ -126,7 +126,7 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * 
+     *
      * @param string $dir
      * @return void
      */
@@ -152,7 +152,7 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * 
+     *
      * @param string $filename
      * @param string $type
      * @return void
