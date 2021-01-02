@@ -213,7 +213,7 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     /**
      * A setup method that initializes the app if not initialized.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->getApp(); // Initialize the app
         parent::setUp();
@@ -222,7 +222,7 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     /**
      * Removes the temp dir created.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach (self::$tempDirs as $dir) {
             $this->deleteDir($dir);
