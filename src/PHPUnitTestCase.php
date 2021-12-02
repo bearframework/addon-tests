@@ -30,7 +30,8 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     protected function initializeApp(bool $setLogger = true, bool $setDataDriver = true, bool $setCacheDriver = true, bool $addAddon = true): \BearFramework\App
     {
         $app = new \BearFramework\App();
-        $app->request->base = 'http://example.com/';
+        $app->request->base = 'http://example.com';
+        $app->request->path->set('/');
         $app->request->method = 'GET';
 
         if ($setLogger) {
