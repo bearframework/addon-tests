@@ -88,6 +88,34 @@ class PHPUnitTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * 
+     * @param string $url
+     * @return \BearFramework\App\Request
+     */
+    public function makeRequest(string $url, string $method = 'GET'): \BearFramework\App\Request
+    {
+        $request = new \BearFramework\App\Request();
+        $request->method = $method;
+        $request->setURL($url);
+        return $request;
+    }
+
+    /**
+     * 
+     * @param \BearFramework\App\Request $request
+     * @return \BearFramework\App\Response
+     */
+    public function processRequest(\BearFramework\App\Request $request): \BearFramework\App\Response
+    {
+        $app = $this->getApp();
+        $response = $app->routes->getResponse($request);
+        if (!($response instanceof \BearFramework\App\Response)) {
+            $response = new \BearFramework\App\Response\NotFound();
+        }
+        return $response;
+    }
+
+    /**
      *
      * @return string
      */
